@@ -94,7 +94,6 @@ class IHex(object):
       end = start + len(data)
       if addr >= start and addr <= end:
         return start
-
     return None
 
   def insert_data(self, istart, idata):
@@ -194,3 +193,20 @@ class IHex(object):
     f = open(fname, "w")
     f.write(self.write())
     f.close()
+
+if __name__ == "__main__":
+  import os, sys
+  if len(sys.argv) <2:
+    print "Usage: %s <filename> [row bytes]\n" % os.path.basename(sys.argv[0])
+    sys.exit(1)
+  filename = sys.argv[1]
+  row_bytes = None
+  if len(sys.argv) > 2:
+    try:
+        row_bytes = int(sys.argv[2])
+    except:
+        pass
+  ihex = IHex.read_file(filename)
+  if row_bytes:
+    ihex.set_row_bytes(row_bytes)
+  print ihex.write()
