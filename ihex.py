@@ -194,19 +194,31 @@ class IHex(object):
     f.write(self.write())
     f.close()
 
+  def binary(self):
+    output = ""
+    for start, data in sorted(self.areas.iteritems()):
+      offset = len(output)
+      if start>offset:
+        output += "\0" * (start-offset)
+      output += data
+    return output
+
 if __name__ == "__main__":
   import os, sys
   if len(sys.argv) <2:
-    print "Usage: %s <filename> [row bytes]\n" % os.path.basename(sys.argv[0])
+    print "Usage: %s <filename> [#row bytes|bin]\n" % os.path.basename(sys.argv[0])
     sys.exit(1)
   filename = sys.argv[1]
+  ihex = IHex.read_file(filename)
   row_bytes = None
   if len(sys.argv) > 2:
-    try:
+    if sys.argv[2] != 'bin':
+      try:
         row_bytes = int(sys.argv[2])
-    except:
+      except:
         pass
-  ihex = IHex.read_file(filename)
   if row_bytes:
     ihex.set_row_bytes(row_bytes)
-  print ihex.write()
+    print ihex.write()
+  else:
+    sys.stdout.write(ihex.binary())
